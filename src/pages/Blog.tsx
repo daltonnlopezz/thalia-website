@@ -1,9 +1,30 @@
-import React, { useState } from 'react';
-import { Calendar, Clock, User, Heart, BookOpen, Search } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Calendar, Clock, User, Heart, BookOpen, Search, X } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+
+interface BlogPost {
+  id: number;
+  title: string;
+  excerpt: string;
+  content: string;
+  category: string;
+  author: string;
+  date: string;
+  readTime: string;
+  image: string;
+  tags: string[];
+  likes: number;
+  featured: boolean;
+  markdownContent?: string;
+}
 
 const Blog: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
 
   const categories = [
     { id: 'all', name: 'All Posts' },
@@ -14,92 +35,156 @@ const Blog: React.FC = () => {
     { id: 'recipes', name: 'Recipes' }
   ];
 
-  const blogPosts = [
-    {
-      id: 1,
-      title: 'My Pilates Journey: From Beginner to Instructor',
-      excerpt: 'How I discovered pilates and how it transformed not just my body, but my entire approach to wellness and self-care.',
-      content: 'Full blog post content would go here...',
-      category: 'pilates',
-      author: 'Thalia',
-      date: '2024-01-15',
-      readTime: '5 min read',
-      image: '/api/placeholder/600/400',
-      tags: ['pilates', 'journey', 'wellness'],
-      likes: 42,
-      featured: true
-    },
-    {
-      id: 2,
-      title: '5 Morning Routines That Changed My Life',
-      excerpt: 'Simple morning habits that set the tone for a productive, peaceful day ahead.',
-      content: 'Full blog post content would go here...',
-      category: 'lifestyle',
-      author: 'Thalia',
-      date: '2024-01-12',
-      readTime: '3 min read',
-      image: '/api/placeholder/600/400',
-      tags: ['morning routine', 'productivity', 'self-care'],
-      likes: 38,
-      featured: false
-    },
-    {
-      id: 3,
-      title: 'Sustainable Activewear: Why It Matters',
-      excerpt: 'The environmental impact of our clothing choices and how to build a more sustainable wardrobe.',
-      content: 'Full blog post content would go here...',
-      category: 'fashion',
-      author: 'Thalia',
-      date: '2024-01-10',
-      readTime: '4 min read',
-      image: '/api/placeholder/600/400',
-      tags: ['sustainability', 'fashion', 'environment'],
-      likes: 29,
-      featured: false
-    },
-    {
-      id: 4,
-      title: 'The Mind-Body Connection in Pilates',
-      excerpt: 'Exploring how pilates strengthens not just our physical body, but our mental and emotional wellbeing too.',
-      content: 'Full blog post content would go here...',
-      category: 'pilates',
-      author: 'Thalia',
-      date: '2024-01-08',
-      readTime: '6 min read',
-      image: '/api/placeholder/600/400',
-      tags: ['pilates', 'mindfulness', 'wellness'],
-      likes: 51,
-      featured: true
-    },
-    {
-      id: 5,
-      title: 'My Favorite Smoothie Bowl Recipe',
-      excerpt: 'A nutrient-packed breakfast that fuels my morning pilates sessions and keeps me energized all day.',
-      content: 'Full blog post content would go here...',
-      category: 'recipes',
-      author: 'Thalia',
-      date: '2024-01-05',
-      readTime: '2 min read',
-      image: '/api/placeholder/600/400',
-      tags: ['recipes', 'healthy eating', 'breakfast'],
-      likes: 33,
-      featured: false
-    },
-    {
-      id: 6,
-      title: 'Building Confidence Through Movement',
-      excerpt: 'How pilates helped me develop a deeper sense of self-confidence and body positivity.',
-      content: 'Full blog post content would go here...',
-      category: 'wellness',
-      author: 'Thalia',
-      date: '2024-01-03',
-      readTime: '4 min read',
-      image: '/api/placeholder/600/400',
-      tags: ['confidence', 'body positivity', 'movement'],
-      likes: 47,
-      featured: false
+  // Function to parse frontmatter from markdown
+  const parseFrontmatter = (content: string) => {
+    const frontmatterRegex = /^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/;
+    const match = content.match(frontmatterRegex);
+    
+    if (match) {
+      const frontmatter = match[1];
+      const markdownContent = match[2];
+      
+      const metadata: any = {};
+      frontmatter.split('\n').forEach(line => {
+        const [key, ...valueParts] = line.split(':');
+        if (key && valueParts.length > 0) {
+          const value = valueParts.join(':').trim().replace(/^["']|["']$/g, '');
+          if (key.trim() === 'tags') {
+            metadata[key.trim()] = value.split(',').map(tag => tag.trim());
+          } else if (key.trim() === 'featured') {
+            metadata[key.trim()] = value === 'true';
+          } else {
+            metadata[key.trim()] = value;
+          }
+        }
+      });
+      
+      return { metadata, content: markdownContent };
     }
-  ];
+    
+    return { metadata: {}, content };
+  };
+
+  // Load blog posts from markdown files
+  useEffect(() => {
+    const loadBlogPosts = async () => {
+      try {
+        // For now, we'll use the sample post and some hardcoded posts
+        // In a real implementation, you'd fetch from a list of markdown files
+        const samplePostContent = `---
+title: "My First Blog Post"
+excerpt: "This is a sample blog post to show Thalia how to create new posts."
+category: "lifestyle"
+author: "Thalia"
+date: "2024-01-15"
+readTime: "3 min read"
+tags: ["sample", "first-post", "getting-started"]
+featured: true
+---
+
+# Welcome to My Blog!
+
+This is how you create a new blog post. Here's what you need to know:
+
+## How to Create a New Post
+
+1. **Create a new file** in the \`public/blog-posts/\` folder
+2. **Name it** something like \`my-post-title.md\`
+3. **Copy this template** and fill in your content
+4. **Write your post** using Markdown (it's easy!)
+
+## Markdown Basics
+
+- Use \`#\` for headings
+- Use \`**bold**\` for **bold text**
+- Use \`*italic*\` for *italic text*
+- Use \`-\` for bullet points
+- Use \`[link text](URL)\` for links
+
+## Example Content
+
+Here's some sample content to show you how it works:
+
+> This is a quote block. Perfect for highlighting important information!
+
+### Lists are easy too:
+
+- First item
+- Second item
+- Third item
+
+### And you can add images:
+
+![Sample Image](https://via.placeholder.com/600x400)
+
+## That's It!
+
+Once you save your file and push it to GitHub, it will automatically appear on the website. Pretty cool, right?
+
+---
+
+*Happy blogging! 💕*`;
+
+        const { metadata, content } = parseFrontmatter(samplePostContent);
+        
+        const newPosts: BlogPost[] = [
+          {
+            id: 1,
+            title: metadata.title || 'Sample Post',
+            excerpt: metadata.excerpt || 'A sample blog post',
+            content: metadata.excerpt || 'A sample blog post',
+            category: metadata.category || 'lifestyle',
+            author: metadata.author || 'Thalia',
+            date: metadata.date || '2024-01-15',
+            readTime: metadata.readTime || '3 min read',
+            image: '/api/placeholder/600/400',
+            tags: metadata.tags || ['sample'],
+            likes: 42,
+            featured: metadata.featured || true,
+            markdownContent: content
+          },
+          // Keep some of the original hardcoded posts
+          {
+            id: 2,
+            title: '5 Morning Routines That Changed My Life',
+            excerpt: 'Simple morning habits that set the tone for a productive, peaceful day ahead.',
+            content: 'Full blog post content would go here...',
+            category: 'lifestyle',
+            author: 'Thalia',
+            date: '2024-01-12',
+            readTime: '3 min read',
+            image: '/api/placeholder/600/400',
+            tags: ['morning routine', 'productivity', 'self-care'],
+            likes: 38,
+            featured: false
+          },
+          {
+            id: 3,
+            title: 'Sustainable Activewear: Why It Matters',
+            excerpt: 'The environmental impact of our clothing choices and how to build a more sustainable wardrobe.',
+            content: 'Full blog post content would go here...',
+            category: 'fashion',
+            author: 'Thalia',
+            date: '2024-01-10',
+            readTime: '4 min read',
+            image: '/api/placeholder/600/400',
+            tags: ['sustainability', 'fashion', 'environment'],
+            likes: 29,
+            featured: false
+          }
+        ];
+
+        setBlogPosts(newPosts);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error loading blog posts:', error);
+        setLoading(false);
+      }
+    };
+
+    loadBlogPosts();
+  }, []);
+
 
   const filteredPosts = blogPosts.filter(post => {
     const matchesCategory = selectedCategory === 'all' || post.category === selectedCategory;
@@ -110,6 +195,17 @@ const Blog: React.FC = () => {
 
   const featuredPost = blogPosts.find(post => post.featured);
   const regularPosts = filteredPosts.filter(post => !post.featured);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading blog posts...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -158,9 +254,18 @@ const Blog: React.FC = () => {
                 {featuredPost.title}
               </h2>
               
-              <p className="text-xl text-gray-600 mb-6 max-w-3xl">
-                {featuredPost.excerpt}
-              </p>
+              <div className="text-xl text-gray-600 mb-6 max-w-3xl">
+                {featuredPost.markdownContent ? (
+                  <ReactMarkdown 
+                    remarkPlugins={[remarkGfm]}
+                    className="prose prose-lg max-w-none"
+                  >
+                    {featuredPost.markdownContent.split('\n').slice(0, 3).join('\n')}
+                  </ReactMarkdown>
+                ) : (
+                  featuredPost.excerpt
+                )}
+              </div>
               
               <div className="flex flex-wrap items-center gap-6 mb-8">
                 <div className="flex items-center space-x-2 text-gray-600">
@@ -192,7 +297,10 @@ const Blog: React.FC = () => {
                 ))}
               </div>
               
-              <button className="btn-primary">
+              <button 
+                className="btn-primary"
+                onClick={() => setSelectedPost(featuredPost)}
+              >
                 Read Full Post
               </button>
             </div>
@@ -241,6 +349,7 @@ const Blog: React.FC = () => {
               <article
                 key={post.id}
                 className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer"
+                onClick={() => setSelectedPost(post)}
               >
                 <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative">
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -292,7 +401,13 @@ const Blog: React.FC = () => {
                     ))}
                   </div>
                   
-                  <button className="text-primary-600 font-medium hover:text-primary-700 transition-colors duration-200">
+                  <button 
+                    className="text-primary-600 font-medium hover:text-primary-700 transition-colors duration-200"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedPost(post);
+                    }}
+                  >
                     Read More →
                   </button>
                 </div>
@@ -323,6 +438,53 @@ const Blog: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Blog Post Modal */}
+      {selectedPost && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-8">
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h2 className="text-3xl font-serif font-bold text-gray-900 mb-2">
+                    {selectedPost.title}
+                  </h2>
+                  <div className="flex items-center space-x-4 text-sm text-gray-500">
+                    <div className="flex items-center space-x-1">
+                      <User className="h-4 w-4" />
+                      <span>{selectedPost.author}</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <Calendar className="h-4 w-4" />
+                      <span>{new Date(selectedPost.date).toLocaleDateString()}</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <Clock className="h-4 w-4" />
+                      <span>{selectedPost.readTime}</span>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedPost(null)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+              
+              <div className="prose prose-lg max-w-none">
+                {selectedPost.markdownContent ? (
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {selectedPost.markdownContent}
+                  </ReactMarkdown>
+                ) : (
+                  <p>{selectedPost.content}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
