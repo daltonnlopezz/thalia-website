@@ -125,7 +125,8 @@ Once you save your file and push it to GitHub, it will automatically appear on t
 
 *Happy blogging! 💕*`;
 
-        const { metadata, content } = parseFrontmatter(samplePostContent);
+        // Parse sample post (not used in current implementation)
+        // const { metadata, content } = parseFrontmatter(samplePostContent);
         
         // Load the pilates journey post
         const pilatesPostContent = `---

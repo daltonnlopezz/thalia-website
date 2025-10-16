@@ -5,7 +5,7 @@ Hi Thalia! This folder is where you'll create all your blog posts. It's super ea
 ## 🚀 Quick Start
 
 1. **Create a new file** in this folder
-2. **Name it** something like `my-awesome-post.md`
+2. **Name it** something like `my-awesome-post.md` [title].md
 3. **Copy the template** from `sample-post.md`
 4. **Fill in your content** and save
 5. **Push to GitHub** (or ask Dalton to help!)
