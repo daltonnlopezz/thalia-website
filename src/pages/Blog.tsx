@@ -69,64 +69,7 @@ const Blog: React.FC = () => {
   useEffect(() => {
     const loadBlogPosts = async () => {
       try {
-        // For now, we'll use the sample post and some hardcoded posts
-        // In a real implementation, you'd fetch from a list of markdown files
-        const samplePostContent = `---
-title: "My First Blog Post"
-excerpt: "This is a sample blog post to show Thalia how to create new posts."
-category: "lifestyle"
-author: "Thalia"
-date: "2024-01-15"
-readTime: "3 min read"
-tags: ["sample", "first-post", "getting-started"]
-featured: true
----
-
-# Welcome to My Blog!
-
-This is how you create a new blog post. Here's what you need to know:
-
-## How to Create a New Post
-
-1. **Create a new file** in the \`public/blog-posts/\` folder
-2. **Name it** something like \`my-post-title.md\`
-3. **Copy this template** and fill in your content
-4. **Write your post** using Markdown (it's easy!)
-
-## Markdown Basics
-
-- Use \`#\` for headings
-- Use \`**bold**\` for **bold text**
-- Use \`*italic*\` for *italic text*
-- Use \`-\` for bullet points
-- Use \`[link text](URL)\` for links
-
-## Example Content
-
-Here's some sample content to show you how it works:
-
-> This is a quote block. Perfect for highlighting important information!
-
-### Lists are easy too:
-
-- First item
-- Second item
-- Third item
-
-### And you can add images:
-
-![Sample Image](https://via.placeholder.com/600x400)
-
-## That's It!
-
-Once you save your file and push it to GitHub, it will automatically appear on the website. Pretty cool, right?
-
----
-
-*Happy blogging! 💕*`;
-
-        // Parse sample post (not used in current implementation)
-        // const { metadata, content } = parseFrontmatter(samplePostContent);
+        // Load example blog posts with real content
         
         // Load the pilates journey post
         const pilatesPostContent = `---
@@ -450,8 +393,8 @@ This month, I challenge you to:
         const { metadata: fashionMetadata, content: fashionContent } = parseFrontmatter(sustainableFashionContent);
 
         const newPosts: BlogPost[] = [
-          {
-            id: 1,
+    {
+      id: 1,
             title: pilatesMetadata.title || 'My Pilates Journey',
             excerpt: pilatesMetadata.excerpt || 'A sample blog post',
             content: pilatesMetadata.excerpt || 'A sample blog post',
@@ -459,14 +402,14 @@ This month, I challenge you to:
             author: pilatesMetadata.author || 'Thalia',
             date: pilatesMetadata.date || '2024-01-15',
             readTime: pilatesMetadata.readTime || '5 min read',
-            image: '/api/placeholder/600/400',
+      image: '/api/placeholder/600/400',
             tags: pilatesMetadata.tags || ['pilates', 'journey'],
-            likes: 42,
+      likes: 42,
             featured: pilatesMetadata.featured || true,
             markdownContent: pilatesContent
-          },
-          {
-            id: 2,
+    },
+    {
+      id: 2,
             title: morningMetadata.title || 'Morning Routines',
             excerpt: morningMetadata.excerpt || 'Simple morning habits',
             content: morningMetadata.excerpt || 'Simple morning habits',
@@ -474,14 +417,14 @@ This month, I challenge you to:
             author: morningMetadata.author || 'Thalia',
             date: morningMetadata.date || '2024-01-12',
             readTime: morningMetadata.readTime || '4 min read',
-            image: '/api/placeholder/600/400',
+      image: '/api/placeholder/600/400',
             tags: morningMetadata.tags || ['morning routine'],
-            likes: 38,
+      likes: 38,
             featured: morningMetadata.featured || false,
             markdownContent: morningContent
-          },
-          {
-            id: 3,
+    },
+    {
+      id: 3,
             title: fashionMetadata.title || 'Sustainable Activewear',
             excerpt: fashionMetadata.excerpt || 'Environmental impact of clothing',
             content: fashionMetadata.excerpt || 'Environmental impact of clothing',
@@ -489,9 +432,9 @@ This month, I challenge you to:
             author: fashionMetadata.author || 'Thalia',
             date: fashionMetadata.date || '2024-01-10',
             readTime: fashionMetadata.readTime || '6 min read',
-            image: '/api/placeholder/600/400',
+      image: '/api/placeholder/600/400',
             tags: fashionMetadata.tags || ['sustainability'],
-            likes: 29,
+      likes: 29,
             featured: fashionMetadata.featured || false,
             markdownContent: fashionContent
           }
