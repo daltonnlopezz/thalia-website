@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, User, Heart, BookOpen, Tag, Search } from 'lucide-react';
+import { Calendar, Clock, User, Heart, BookOpen, Search } from 'lucide-react';
 
 const Blog: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, Users, Heart, Star, CheckCircle } from 'lucide-react';
+import { Clock, Users, Heart, Star, CheckCircle } from 'lucide-react';
 
 const Pilates: React.FC = () => {
   const [selectedClass, setSelectedClass] = useState<string | null>(null);

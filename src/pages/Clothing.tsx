@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Heart, Star, Plus, Minus, Search, Filter } from 'lucide-react';
+import { ShoppingBag, Heart, Star, Plus, Minus, Search } from 'lucide-react';
 
 const Clothing: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');

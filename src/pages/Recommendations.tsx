@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Star, Heart, ExternalLink, Filter, Search, ThumbsUp, MessageCircle } from 'lucide-react';
+import { Star, Heart, ExternalLink, Search } from 'lucide-react';
 
 const Recommendations: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
